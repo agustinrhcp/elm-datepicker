@@ -44,6 +44,7 @@ type Msg
     | MouseUp
     | ChangePicking Pickable
     | ChangeFocusAndPicking Date Pickable
+    | KeyDown Int
 
 
 {-| The type of date picker settings.
@@ -368,7 +369,14 @@ update settings msg (DatePicker ({ forceOpen } as model)) =
             )
 
         Text text ->
-            ( DatePicker { model | inputText = Just text }, None )
+            case settings.parser text of
+                Ok date ->
+                    ( DatePicker { model | inputText = Just text, focused = Just date, open = True }
+                    , Picked date
+                    )
+
+                Err _ ->
+                    ( DatePicker { model | inputText = Just text, open = True }, None )
 
         SubmitText ->
             if forceOpen then
@@ -427,6 +435,14 @@ update settings msg (DatePicker ({ forceOpen } as model)) =
 
         MouseUp ->
             ( DatePicker { model | forceOpen = False }, None )
+
+        KeyDown keyCode ->
+            case keyCode of
+                27 ->
+                    ( DatePicker { model | open = False }, None )
+
+                _ ->
+                    ( DatePicker model, None )
 
 
 {-| Generate a message that will act as if the user has chosen a certain date,
@@ -499,6 +515,7 @@ view pickedDate settings (DatePicker model) =
                  , onBlur Blur
                  , onClick Focus
                  , onFocus Focus
+                 , on "keydown" (Json.map KeyDown Html.Events.keyCode)
                  ]
                     ++ settings.inputAttributes
                     ++ potentialInputId
