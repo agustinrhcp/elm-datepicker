@@ -1,9 +1,9 @@
 {
     "type": "package",
-    "name": "agustinrhcp/elm-datepicker",
+    "name": "CurrySoftware/elm-datepicker",
     "summary": "A reusable date picker component",
     "license": "BSD-3-Clause",
-    "version": "1.0.1",
+    "version": "4.0.0",
     "exposed-modules": [
         "DatePicker"
     ],
